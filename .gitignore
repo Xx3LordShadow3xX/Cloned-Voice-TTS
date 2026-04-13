@@ -8,3 +8,4 @@ test_outputs/
 !voice_data/.gitkeep
 .DS_Store
 node_modules/
+.claude/
