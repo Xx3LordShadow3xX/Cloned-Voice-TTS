@@ -1,0 +1,51 @@
+/* ── Custom styles for Voice TTS App ── */
+
+/* Slow spin animation for processing icon */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+/* Backend status indicator */
+#backend-status.status-ready  { color: #4ade80; background: rgba(74, 222, 128, 0.1); }
+#backend-status.status-loading { color: #facc15; background: rgba(250, 204, 21, 0.1); }
+#backend-status.status-offline { color: #f87171; background: rgba(248, 113, 113, 0.1); }
+
+/* Drop zone active (file hovering over it) */
+#drop-zone.drag-over {
+  border-color: #6366f1;
+  background-color: rgba(99, 102, 241, 0.05);
+}
+
+/* Audio player styling */
+audio {
+  background-color: #1f2937;
+  border-radius: 8px;
+}
+audio::-webkit-media-controls-panel {
+  background-color: #1f2937;
+}
+
+/* Smooth section transitions */
+section {
+  animation: fadeIn 0.2s ease-in;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Focus styles for accessibility */
+#drop-zone:focus {
+  outline: 2px solid #6366f1;
+  outline-offset: 4px;
+}
+
+/* Mobile responsive audio player */
+@media (max-width: 640px) {
+  audio { width: 100%; }
+  .flex-wrap > button { width: 100%; justify-content: center; }
+}

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document Reader — Voice TTS</title>
+  <meta name="description" content="Upload a document and have it read aloud in a personalized AI voice." />
+
+  <!-- Tailwind CSS via CDN (no build step) -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col">
+
+  <!-- ── Header ── -->
+  <header class="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl">🎙️</span>
+      <h1 class="text-xl font-semibold tracking-tight">Document Reader</h1>
+    </div>
+    <div id="backend-status" class="text-sm font-mono px-3 py-1 rounded-full bg-gray-800 text-gray-400">
+      ● Checking...
+    </div>
+  </header>
+
+  <!-- ── Main ── -->
+  <main class="flex-1 flex flex-col items-center justify-center px-4 py-12">
+
+    <!-- Upload Section -->
+    <section id="upload-section" class="w-full max-w-xl">
+
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold mb-2">Read Any Document Aloud</h2>
+        <p class="text-gray-400">Upload a TXT, PDF, or DOCX file and hear it in a personalized AI voice.</p>
+      </div>
+
+      <!-- Drop Zone -->
+      <div id="drop-zone"
+           class="border-2 border-dashed border-gray-600 rounded-2xl p-12
+                  flex flex-col items-center justify-center gap-4
+                  cursor-pointer transition-all duration-200
+                  hover:border-indigo-500 hover:bg-gray-900"
+           role="button"
+           aria-label="Upload zone — click or drag a file here"
+           tabindex="0">
+
+        <div id="drop-icon" class="text-5xl">📄</div>
+        <div class="text-center">
+          <p class="text-lg font-medium">Drag &amp; drop your document here</p>
+          <p class="text-sm text-gray-500 mt-1">or click to browse files</p>
+        </div>
+        <p class="text-xs text-gray-600">TXT · PDF · DOCX &nbsp;|&nbsp; Max 10 MB</p>
+
+        <!-- Hidden file input -->
+        <input type="file"
+               id="file-input"
+               class="hidden"
+               accept=".txt,.pdf,.docx"
+               aria-hidden="true" />
+      </div>
+
+      <!-- Error message -->
+      <div id="upload-error" class="hidden mt-4 p-4 bg-red-900 border border-red-700 rounded-xl text-red-200 text-sm">
+        <span id="upload-error-text"></span>
+      </div>
+    </section>
+
+    <!-- Confirmation Dialog (hidden initially) -->
+    <section id="confirm-section" class="hidden w-full max-w-xl">
+
+      <div class="bg-gray-900 border border-gray-700 rounded-2xl p-6">
+        <h3 class="text-lg font-semibold mb-1">Ready to synthesize</h3>
+        <p class="text-sm text-gray-400 mb-4">
+          File: <span id="confirm-filename" class="text-gray-200 font-mono"></span>
+          &nbsp;·&nbsp;
+          <span id="confirm-filesize" class="text-gray-400"></span>
+        </p>
+
+        <div id="text-preview-container" class="mb-4">
+          <p class="text-xs text-gray-500 uppercase tracking-widest mb-2">Preview</p>
+          <div id="text-preview"
+               class="bg-gray-800 rounded-lg p-4 text-sm text-gray-300 max-h-32 overflow-y-auto font-mono leading-relaxed">
+          </div>
+        </div>
+
+        <p class="text-xs text-gray-500 mb-4 italic">
+          ⚠️ Audio generation may take 2–5 minutes for a full page on this free service.
+        </p>
+
+        <div class="flex gap-3">
+          <button id="confirm-btn"
+                  class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white
+                         font-semibold py-3 rounded-xl transition-colors duration-150">
+            🎙️ Read Aloud
+          </button>
+          <button id="cancel-btn"
+                  class="px-6 bg-gray-700 hover:bg-gray-600 text-gray-200
+                         font-medium py-3 rounded-xl transition-colors duration-150">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Processing Section (hidden initially) -->
+    <section id="processing-section" class="hidden w-full max-w-xl text-center">
+
+      <div class="bg-gray-900 border border-gray-700 rounded-2xl p-10">
+        <div id="processing-spinner" class="text-6xl mb-4 animate-spin-slow">⚙️</div>
+        <h3 class="text-xl font-semibold mb-2">Generating Audio</h3>
+        <p id="processing-status" class="text-gray-400 text-sm mb-6">
+          Processing your document...
+        </p>
+
+        <!-- Progress bar -->
+        <div class="bg-gray-800 rounded-full h-2 overflow-hidden">
+          <div id="progress-bar" class="h-full bg-indigo-500 rounded-full transition-all duration-500"
+               style="width: 10%;"></div>
+        </div>
+        <p class="text-xs text-gray-600 mt-3">This may take 2–5 minutes. Please keep this tab open.</p>
+      </div>
+    </section>
+
+    <!-- Audio Player Section (hidden initially) -->
+    <section id="player-section" class="hidden w-full max-w-xl">
+
+      <div class="bg-gray-900 border border-gray-700 rounded-2xl p-6">
+
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold">🎧 Your Audio</h3>
+          <span id="player-filename" class="text-sm text-gray-400 font-mono truncate max-w-xs"></span>
+        </div>
+
+        <!-- Native HTML5 audio element -->
+        <audio id="audio-player"
+               controls
+               class="w-full rounded-lg mb-4"
+               aria-label="Generated audio player">
+          Your browser does not support the audio element.
+        </audio>
+
+        <!-- Controls row -->
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+
+          <!-- Playback speed -->
+          <div class="flex items-center gap-2">
+            <label for="speed-select" class="text-xs text-gray-400">Speed</label>
+            <select id="speed-select"
+                    class="bg-gray-800 border border-gray-600 text-sm rounded-lg
+                           px-3 py-1.5 text-gray-200 focus:ring-2 focus:ring-indigo-500">
+              <option value="0.5">0.5×</option>
+              <option value="0.75">0.75×</option>
+              <option value="1" selected>1×</option>
+              <option value="1.25">1.25×</option>
+              <option value="1.5">1.5×</option>
+              <option value="2">2×</option>
+            </select>
+          </div>
+
+          <!-- Download button -->
+          <button id="download-btn"
+                  class="flex items-center gap-2 bg-gray-700 hover:bg-gray-600
+                         text-gray-200 text-sm font-medium px-4 py-2 rounded-lg
+                         transition-colors duration-150">
+            ⬇️ Download WAV
+          </button>
+
+          <!-- New file button -->
+          <button id="new-file-btn"
+                  class="ml-auto text-sm text-indigo-400 hover:text-indigo-300
+                         underline underline-offset-2 transition-colors duration-150">
+            Upload another
+          </button>
+        </div>
+
+        <!-- AI disclosure notice -->
+        <p class="text-xs text-gray-500 border-t border-gray-800 pt-3 mt-2">
+          🤖 Audio generated using AI voice synthesis. This is a synthetic recording, not an authentic human voice.
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer class="border-t border-gray-800 px-6 py-4 text-center text-xs text-gray-600">
+    <p>Uploaded documents are processed in memory and deleted immediately. No content is stored or shared.</p>
+    <p class="mt-1">
+      By uploading, you confirm you have the right to process this document's contents.
+      &nbsp;|&nbsp;
+      Voice synthesis powered by <a href="https://github.com/coqui-ai/TTS" class="underline hover:text-gray-400" target="_blank" rel="noopener">Coqui XTTS v2</a>.
+    </p>
+  </footer>
+
+  <!-- JavaScript modules (load order matters) -->
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/uploader.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+This is a sample text file for testing.
+
+It contains multiple paragraphs.
+
+Unicode test: café, résumé, naïve, über, 日本語
+
+The quick brown fox jumps over the lazy dog.

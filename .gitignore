@@ -1,0 +1,10 @@
+venv/
+__pycache__/
+*.pyc
+.env
+voice_data/
+test_outputs/
+*.wav
+!voice_data/.gitkeep
+.DS_Store
+node_modules/

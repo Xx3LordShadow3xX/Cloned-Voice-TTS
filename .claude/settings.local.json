@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install:*)",
+      "Bash(python -m pytest tests/test_parser.py tests/test_security.py tests/test_tts_engine.py -v --tb=short)",
+      "Bash(where python:*)",
+      "Bash(where python3:*)",
+      "Bash(\"C:\\\\Users\\\\haru2\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe\" -m pip install fastapi uvicorn python-multipart slowapi pymupdf python-docx scipy python-magic httpx pytest pytest-asyncio)",
+      "Bash(\"C:\\\\Users\\\\haru2\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe\" -m pytest tests/test_parser.py tests/test_tts_engine.py -v --tb=short)",
+      "Bash(\"C:\\\\Users\\\\haru2\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe\" -m pytest tests/test_security.py tests/test_api.py -v --tb=short)",
+      "Bash(\"C:\\\\Users\\\\haru2\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe\" -m pip install python-magic-bin)",
+      "Bash(\"C:\\\\Users\\\\haru2\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe\" -m pytest tests/test_parser.py tests/test_security.py tests/test_tts_engine.py tests/test_api.py -v --tb=short)",
+      "Bash(\"C:\\\\Users\\\\haru2\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python313\\\\python.exe\" tests/fixtures/create_fixtures.py)"
+    ]
+  }
+}
